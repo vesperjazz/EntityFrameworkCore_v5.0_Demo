@@ -1,0 +1,74 @@
+1. Create Empty .NET Core Console application.
+
+2. Install EFCore.
+- Install-Package Microsoft.EntityFrameworkCore
+- Install-Package Microsoft.EntityFrameworkCore.SqlServer
+- Install-Package Microsoft.EntityFrameworkCore.Tools
+
+3. Create context class that inherits from DbContext
+- Override OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+	optionsBuilder.UseSqlServer("Server=IVANCHIN-XPS;Database=EFCoreDemo;User Id=sa; Password=Sqlserver2016;");
+}
+- Connection string is Server=IVANCHIN-XPS;Database=EFCoreDemo;User Id=sa; Password=Sqlserver2016;
+
+4. Create Person and Gender domain entities classes.
+- Person has a many to 1 relationship to Gender.
+
+5. Configure domain entities class in DbContext.
+- Override OnModelCreating(ModelBuilder modelBuilder) {}
+- Add DbSet for both Person and Gender.
+- EntityFramework is convention over configuration.
+- Show configuration of domain entity properties and relationship, navigation property.
+  modelBuilder.Entity<Person>()
+	.HasOne(p => p.Gender)
+	.WithMany(g => g.Persons)
+	.HasForeignKey(p => p.GenderID);
+- Show configuration of reverse relationship.
+	modelBuilder.Entity<Gender>()
+		.HasMany(g => g.Persons)
+		.WithOne(p => p.Gender)
+		.HasForeignKey(p => p.GenderID);
+- Show data annotation vs fluent api  
+    modelBuilder.Entity<Gender>().HasIndex(g => g.Code).IsUnique();
+- Show HasData on Gender table for data seeding.
+  Guid needs to be pre-initialised.
+
+6. Add migration.
+- Add-Migration -C EFCoreDemoContext InitialCreate
+- Explain why -C is needed sometimes.
+
+7. Create database.
+- Update-Database -C EFCoreDemoContext
+- Show tables and their properties.
+- Show database diagram.
+- Show migration history.
+
+8. Make GenderID in person table nullable.
+- Explain difference reference and value type.
+- Requires the nullable syntax.
+- Update-Database -C EFCoreDemoContext
+- Show updated property on Person table.
+- Show migration history.
+
+9. Revert to non-nullable GenderID for person table.
+- Update-Database -C EFCoreDemoContext InitialCreate
+- Show updated property on Person table.
+- Show migration history.
+
+10. Demonstrate CRUD.
+- Read all genders.
+- Insert Person.
+  Show that navigation property can be used besides foreignkey for insertion.
+  context.SaveChanges();
+- Update Person.
+- Delete Person.
+
+11. Database first.
+- Create new console project.
+- Install-Package Microsoft.EntityFrameworkCore
+- Install-Package Microsoft.EntityFrameworkCore.SqlServer
+- Scaffold-DbContext "Server=IVANCHIN-XPS;Database=EFCoreDemo;User Id=sa; Password=Sqlserver2016;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir DomainEntities
+- Show query.
+
+
+
